@@ -5,12 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -40,10 +38,5 @@ public class FilmController {
             log.warn("Фильм с ID {} не найден для обновления.", updatedFilm.getId());
             return new ResponseEntity<>(new ErrorResponse("Фильм не найден"), HttpStatus.NOT_FOUND);
         }
-    }
-
-    @GetMapping
-    public ResponseEntity<List<Film>> getAllFilms() {
-        return ResponseEntity.ok(List.copyOf(films.values()));
     }
 }
