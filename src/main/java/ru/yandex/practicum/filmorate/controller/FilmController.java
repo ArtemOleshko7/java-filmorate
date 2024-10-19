@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import ru.yandex.practicum.filmorate.model.Film;
@@ -17,7 +18,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 @RequestMapping("/films")
 public class FilmController {
 
-    private int currentId = 1;
+    private int currentId = 0;
     private final Map<Integer, Film> films = new HashMap<>();
 
     @PostMapping
@@ -38,5 +39,10 @@ public class FilmController {
             log.warn("Фильм с ID {} не найден для обновления.", updatedFilm.getId());
             return new ResponseEntity<>(new ErrorResponse("Фильм не найден"), HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Film>> getAllFilms() {
+        return ResponseEntity.ok(List.copyOf(films.values()));
     }
 }

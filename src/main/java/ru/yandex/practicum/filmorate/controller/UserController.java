@@ -19,7 +19,7 @@ import ru.yandex.practicum.filmorate.model.User;
 @RequestMapping("/users")
 public class UserController {
 
-    private int currentId = 1;
+    private int currentId = 0;
     private final Map<Integer, User> users = new HashMap<>();
 
     @PostMapping
