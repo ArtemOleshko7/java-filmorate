@@ -18,7 +18,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 @RequestMapping("/films")
 public class FilmController {
 
-    private int currentId = 0;
+    private int currentId = 1;
     private final Map<Integer, Film> films = new HashMap<>();
 
     @PostMapping
