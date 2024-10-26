@@ -46,4 +46,4 @@ build/
 db/*
 
 # Игнорируем файл checkstyle.xml
-checkstyle.xml
+java-filmorate/checkstyle.xml
