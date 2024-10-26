@@ -45,5 +45,3 @@ build/
 *.db
 db/*
 
-# Игнорируем файл checkstyle.xml
-checkstyle.xml
