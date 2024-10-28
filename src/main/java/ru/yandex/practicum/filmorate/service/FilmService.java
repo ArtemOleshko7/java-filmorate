@@ -37,9 +37,11 @@ public class FilmService {
     public void like(int filmId, int userId) {
         Film film = filmStorage.getById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм с ID " + filmId + " не найден."));
-        if (!filmStorage.isUserExist(userId)) {
+
+        if (!isUserExist(userId)) {
             throw new NotFoundException("Пользователь с ID " + userId + " не найден.");
         }
+
         film.addLike(userId);
         filmStorage.updateFilm(film);
     }
@@ -47,9 +49,11 @@ public class FilmService {
     public void unlike(int filmId, int userId) {
         Film film = filmStorage.getById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм с ID " + filmId + " не найден."));
-        if (!filmStorage.isUserExist(userId)) {
+
+        if (!isUserExist(userId)) {
             throw new NotFoundException("Пользователь с ID " + userId + " не найден.");
         }
+
         film.removeLike(userId);
         filmStorage.updateFilm(film);
     }
