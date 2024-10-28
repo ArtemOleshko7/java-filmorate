@@ -49,34 +49,34 @@ public class UserService {
         return userStorage.getAllUsers();
     }
 
-    public void friend(int id1, int id2) {
-        User user = userStorage.getById(id1)
-                .orElseThrow(() -> new NotFoundException("Пользователь с ID " + id1 + " не найден."));
-        User friend = userStorage.getById(id2)
-                .orElseThrow(() -> new NotFoundException("Пользователь с ID " + id2 + " не найден."));
-        user.addFriend(id2);
-        friend.addFriend(id1);
+    public void friend(int firstUserId, int secondUserId) {
+        User user = userStorage.getById(firstUserId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с ID " + firstUserId + " не найден."));
+        User friend = userStorage.getById(secondUserId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с ID " + secondUserId + " не найден."));
+        user.addFriend(secondUserId);
+        friend.addFriend(firstUserId);
         userStorage.updateUser(user);
         userStorage.updateUser(friend);
-        log.info("Пользователи с id {} и {} теперь друзья.", id1, id2);
+        log.info("Пользователи с id {} и {} теперь друзья.", firstUserId, secondUserId);
     }
 
-    public void unfriend(int id1, int id2) {
-        User user = userStorage.getById(id1)
-                .orElseThrow(() -> new NotFoundException("Пользователь с ID " + id1 + " не найден."));
-        User friend = userStorage.getById(id2)
-                .orElseThrow(() -> new NotFoundException("Пользователь с ID " + id2 + " не найден."));
-        user.removeFriend(id2);
-        friend.removeFriend(id1);
+    public void unfriend(int firstUserId1, int secondUserId) {
+        User user = userStorage.getById(firstUserId1)
+                .orElseThrow(() -> new NotFoundException("Пользователь с ID " + firstUserId1 + " не найден."));
+        User friend = userStorage.getById(secondUserId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с ID " + secondUserId + " не найден."));
+        user.removeFriend(secondUserId);
+        friend.removeFriend(firstUserId1);
         userStorage.updateUser(user);
         userStorage.updateUser(friend);
     }
 
-    public List<User> getCommonFriends(int id1, int id2) {
-        User user = userStorage.getById(id1)
-                .orElseThrow(() -> new NotFoundException("Пользователь с ID " + id1 + " не найден."));
-        User user2 = userStorage.getById(id2)
-                .orElseThrow(() -> new NotFoundException("Пользователь с ID " + id2 + " не найден."));
+    public List<User> getCommonFriends(int userId1, int userId2) {
+        User user = userStorage.getById(userId1)
+                .orElseThrow(() -> new NotFoundException("Пользователь с ID " + userId1 + " не найден."));
+        User user2 = userStorage.getById(userId2)
+                .orElseThrow(() -> new NotFoundException("Пользователь с ID " + userId2 + " не найден."));
         Set<Integer> commonFriendsIds = user.getFriendsIDs().stream()
                 .filter(user2.getFriendsIDs()::contains)
                 .collect(Collectors.toSet());
