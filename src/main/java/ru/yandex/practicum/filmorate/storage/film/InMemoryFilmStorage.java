@@ -54,9 +54,4 @@ public class InMemoryFilmStorage implements FilmStorage {
     public List<Film> getAllFilms() {
         return List.copyOf(films.values());
     }
-
-    @Override
-    public boolean isUserExist(int id) {
-        return userStorage.isUserExist(id);
-    }
 }
