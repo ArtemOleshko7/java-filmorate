@@ -1,61 +1,102 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.ExceptionService;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
+import javax.validation.Valid;
 import java.util.List;
 
-@Controller
-@Validated
+// Аннотация для логирования
+@Slf4j
+// Аннотация для REST-контроллера
+@RestController
+// Генерация конструктора с обязательными параметрами
 @RequiredArgsConstructor
+// Базовый путь для всех методов контроллера
 @RequestMapping("/films")
 public class FilmController {
 
+    // для работы с фильмами
     private final FilmService filmService;
+    // для обработки исключений
+    private final ExceptionService exceptionService;
 
-    @PostMapping
-    public ResponseEntity<Film> addFilm(@Valid @RequestBody Film film) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(filmService.addFilm(film));
-    }
-
-    @PutMapping
-    public ResponseEntity<Film> updateUser(@RequestBody @Valid Film updatedFilm) {
-        return ResponseEntity.ok(filmService.updateFilm(updatedFilm));
-    }
-
+    // Получение списка всех фильмов
     @GetMapping
-    public ResponseEntity<List<Film>> getAllUsers() {
-        return ResponseEntity.ok(filmService.getAllFilms());
+    public List<Film> getFilms() {
+        log.info("Поступил запрос на получение списка фильмов");
+        return filmService.getFilms();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Film> getById(@PathVariable int id) {
-        return ResponseEntity.ok(filmService.getById(id));
+    // Добавление нового фильма
+    @PostMapping
+    public Film addFilm(@Valid @RequestBody Film film) {
+        log.info("Поступил запрос на добавление фильма: {}", film.getName());
+        return filmService.addFilm(film);
     }
 
+    // Обновление существующего фильма
+    @PutMapping
+    public Film updateFilm(@Valid @RequestBody Film film) {
+        // Проверка на наличие фильма
+        if (filmService.getFilmById(film.getId()) == null) {
+            log.error("Film not found");
+            exceptionService.throwNotFound();
+        }
+        log.info("Поступил запрос на обновление фильма: {}", film.getName());
+        return filmService.updateFilm(film);
+    }
+
+    // Добавление лайка к фильму
     @PutMapping("/{id}/like/{userId}")
-    public ResponseEntity<Void> like(@PathVariable int id, @PathVariable int userId) {
-        filmService.like(id, userId);
-        return ResponseEntity.noContent().build();
+    public Film addLike(@PathVariable Long id, @PathVariable Long userId) {
+        // Проверка на наличие фильма и пользователя
+        if (filmService.getFilmById(id) == null || filmService.getUserById(userId) == null) {
+            log.error("Film or user not found");
+            exceptionService.throwNotFound();
+        }
+        log.info("Поступил запрос на добавление лайка фильму с id: {}", id);
+        return filmService.addLike(id, userId);
     }
 
+    // Удаление лайка у фильма
     @DeleteMapping("/{id}/like/{userId}")
-    public ResponseEntity<Void> unlike(@PathVariable int id, @PathVariable int userId) {
-        filmService.unlike(id, userId);
-        return ResponseEntity.noContent().build();
+    public Film deleteLike(@PathVariable Long id, @PathVariable Long userId) {
+        // Проверка на наличие фильма, пользователя и лайка
+        if (filmService.getFilmById(id) == null || filmService.getUserById(userId) == null
+                || !filmService.getFilmById(id).getLikes().contains(userId)) {
+            log.error("Film or user not found, or there is no like to delete");
+            exceptionService.throwNotFound();
+        }
+        log.info("Поступил запрос на удаление лайка у фильма с id: {}", id);
+        return filmService.deleteLike(id, userId);
     }
 
+    // Получение фильма по идентификатору
+    @GetMapping("/{id}")
+    public Film getFilmById(@PathVariable Long id) {
+        // Проверка на наличие фильма
+        if (filmService.getFilmById(id) == null) {
+            log.error("Film not found");
+            exceptionService.throwNotFound();
+        }
+        log.info("Поступил запрос на получение фильма с id {}", id);
+        return filmService.getFilmById(id);
+    }
+
+    // Получение топ популярных фильмов
     @GetMapping("/popular")
-    public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(defaultValue = "10") @Positive(message = "Кол-во фильмов должно быть положительным.") int count) {
-        return ResponseEntity.ok(filmService.getPopularFilms(count));
+    public List<Film> getTop10Films(@RequestParam(defaultValue = "10") int count) {
+        // Проверка на положительное значение count
+        if (count < 0) {
+            log.error("Negative count");
+            exceptionService.throwBadRequest("Count is negative: = " + count + ", ожидали положительное");
+        }
+        log.info("Поступил запрос на получение списка топ {} популярных фильмов", count);
+        return filmService.getTopFilms(count);
     }
 }
