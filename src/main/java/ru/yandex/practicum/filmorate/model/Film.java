@@ -1,45 +1,45 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Data;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
-import ru.yandex.practicum.filmorate.validation.ValidReleaseDate;
+import lombok.*;
+import org.springframework.validation.annotation.Validated; // Импортирует аннотацию для валидации
+import ru.yandex.practicum.filmorate.validator.AfterDate;
 
+import javax.validation.constraints.NotBlank; // Импортирует аннотацию для проверки на пустоту
+import javax.validation.constraints.Positive; // Импортирует аннотацию для проверки положительности
+import javax.validation.constraints.Size; // Импортирует аннотацию для проверки длины строки
 import java.time.LocalDate;
+import java.util.Comparator; // Импортирует интерфейс для сравнения объектов
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet; // Импортирует TreeSet из Java Collections
 
-@Data
+@Setter
+@Getter
+@EqualsAndHashCode
+@ToString
+@NoArgsConstructor // Генерирует конструктор без аргументов
+@Validated
 public class Film {
-    private int id;
 
-    @NotBlank(message = "Название фильма не может быть пустым.")
-    private String name;
+    private Set<Long> likes = new HashSet<>(); // Множество идентификаторов лайков
 
-    @NotNull(message = "Описание не может быть пустым.")
-    @Size(max = 200, message = "Максимальная длина описания — 200 символов.")
-    private String description;
+    private Set<Genre> genres = new TreeSet<>(Comparator.comparingInt(Genre::getId)); // Множество жанров, отсортированных по ID
 
-    @NotNull(message = "Дата релиза не может быть пустой.")
-    @ValidReleaseDate
-    private LocalDate releaseDate;
+    private Long id; // Идентификатор фильма
 
-    @Positive(message = "Продолжительность фильма должна быть положительным числом.")
-    private int duration;
+    @NotBlank(message = "Title is null or blank.") // Валидирует, что название не пустое
+    private String name; // Название фильма
 
-    private final Set<Integer> likes = new HashSet<>();
+    @Size(max = 200, message = "Description length is more than 200 characters.") // Валидирует, что описание не превышает 200 символов
+    private String description; // Описание фильма
 
-    public void addLike(int userId) {
-        likes.add(userId);
-    }
+    @AfterDate("28-12-1895") // Пользовательская аннотация для проверки даты релиза
+    private LocalDate releaseDate; // Дата релиза фильма
 
-    public void removeLike(int userId) {
-        likes.remove(userId);
-    }
+    @Positive(message = "Duration is negative.") // Валидирует, что продолжительность положительна
+    private Integer duration; // Продолжительность фильма в минутах
 
-    public int getLikesCount() {
-        return likes.size();
-    }
+    private Integer rating;
+
+    private Mpa mpa; // Объект Mpa, соответствующий фильму
 }

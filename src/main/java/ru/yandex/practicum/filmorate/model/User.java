@@ -1,41 +1,52 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Data;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Pattern;
+import lombok.*;
+import org.springframework.validation.annotation.Validated;
+import ru.yandex.practicum.filmorate.validator.ReplaceNameWithLogin;
 
+import javax.validation.constraints.Email; // Импорт аннотации для проверки корректности email
+import javax.validation.constraints.NotBlank; // Импорт аннотации для проверки на пустую строку
+import javax.validation.constraints.Past; // Импорт аннотации для проверки даты на прошлое
+import javax.validation.constraints.Positive; // Импорт аннотации для проверки положительного значения
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Setter
+@Getter
+@EqualsAndHashCode
+@ToString
+@NoArgsConstructor
+@Validated // Активирует валидацию для аннотированных полей
+@ReplaceNameWithLogin // Использование пользовательской аннотации для валидации
 public class User {
-    private int id;
 
-    @Email(message = "Электронная почта должна содержать символ '@'.")
-    @NotBlank(message = "Электронная почта не может быть пустой.")
-    private String email;
+    private Set<Long> friends = new HashSet<>(); // Множество для хранения идентификаторов друзей
 
-    @NotBlank(message = "Логин не может быть пустым и содержать пробелы.")
-    @Pattern(regexp = "\\S+", message = "Логин не должен содержать пробелов.")
-    private String login;
+    @Positive // Указывает, что id должен быть положительным
+    private Long id; // Идентификатор пользователя
 
     private String name;
 
-    @NotNull(message = "Дата рождения не может быть пустой.")
-    @PastOrPresent(message = "Дата рождения не может быть в будущем.")
-    private LocalDate birthday;
+    @NotBlank(message = "Email is null or blank.") // Проверка, что поле email не пустое
+    @Email(message = "Email is not valid.") // Проверка на корректность формата email
+    private String email; // Email пользователя
 
-    private final Set<Integer> friendsIDs = new HashSet<>();
+    @Setter(AccessLevel.NONE) // Запрет на авто-сеттер для этого поля
+    @NotBlank(message = "Login is null or blank.") // Проверка, что login не пустой
+    private String login; // Логин пользователя
 
-    public void addFriend(int id) {
-        friendsIDs.add(id);
-    }
+    @Past(message = "Birthday in future.") // Проверка, что дата рождения в прошлом
+    private LocalDate birthday; // Дата рождения пользователя
 
-    public void removeFriend(int id) {
-        friendsIDs.remove(id);
+    // Переопределенный метод установки login с дополнительной логикой
+    public void setLogin(String login) {
+        if (login == null) { // Если login null, устанавливаем null
+            this.login = null;
+        } else if (login.contains(" ")) { // Если login содержит пробелы, устанавливаем пустую строку
+            this.login = "";
+        } else { // В противном случае, сохраняем login
+            this.login = login;
+        }
     }
 }
