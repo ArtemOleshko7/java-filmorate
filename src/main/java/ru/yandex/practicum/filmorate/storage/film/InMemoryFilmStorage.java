@@ -1,62 +1,73 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
-@Component
-@RequiredArgsConstructor
+@Component // Обозначает, что класс является компонентом Spring
 public class InMemoryFilmStorage implements FilmStorage {
 
-    private int currentId = 1;
-    private final Map<Integer, Film> films = new HashMap<>();
-    private final UserStorage userStorage;
+    private final Map<Long, Film> films = new HashMap<>(); // Хранилище фильмов (ID -> Film)
+    private Long filmId = 1L; // Генерация уникальных ID для фильмов
 
+    // Получение списка всех фильмов
+    @Override
+    public List<Film> getFilms() {
+        return new ArrayList<>(films.values()); // Возвращает список значений из хранилища
+    }
+
+    // Добавление нового фильма
     @Override
     public Film addFilm(Film film) {
-        film.setId(currentId++);
-        films.put(film.getId(), film);
-        log.info("Фильм добавлен: {}", film);
+        film.setId(filmId++); // Установка нового ID для фильма
+        film.setRating(film.getLikes().size()); // Установка рейтинга на основе количества лайков
+        films.put(film.getId(), film); // Сохранение фильма в хранилище
+        log.info("Фильм {} добавлен", film.getName()); // Логирование события
+        return film;
+    }
+
+    // Обновление существующего фильма
+    @Override
+    public Film updateFilm(Film film) {
+        film.setRating(film.getLikes().size()); // Обновление рейтинга
+        films.put(film.getId(), film); // Сохранение обновлённого фильма
+        log.info("Фильм c id {} обновлен", film.getId());
         return film;
     }
 
     @Override
-    public Film updateFilm(Film updatedFilm) {
-        if (!films.containsKey(updatedFilm.getId())) {
-            log.warn("Фильм с ID {} не найден для обновления.", updatedFilm.getId());
-            throw new NotFoundException("Фильм с ID " + updatedFilm.getId() + " не найден.");
-        }
-        films.put(updatedFilm.getId(), updatedFilm);
-        log.info("Фильм обновлён: {}", updatedFilm);
-        return updatedFilm;
+    public Film getFilmById(Long id) {
+        return films.get(id);
     }
 
     @Override
-    public Optional<Film> getById(Integer id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID не может быть null.");
-        }
-
-        return Optional.ofNullable(films.get(id));
+    public Film addLike(Long id, Long userId) {
+        films.get(id).getLikes().add(userId); // Добавление ID пользователя в список лайков
+        films.get(id).setRating(films.get(id).getLikes().size()); // Обновление рейтинга
+        log.info("Пользователь с id: {} поставил лайк фильму с id: {}", userId, id);
+        return films.get(id);
     }
 
     @Override
-    public List<Film> getAllFilms() {
-        return List.copyOf(films.values());
+    public Film deleteLike(Long id, Long userId) {
+        films.get(id).getLikes().remove(userId); // Удаление ID пользователя из списка лайков
+        films.get(id).setRating(films.get(id).getLikes().size()); // Обновление рейтинга
+        log.info("Пользователю с id: {} больше не нравится фильм с id: {}", userId, id);
+        return films.get(id);
     }
 
     @Override
-    public boolean isUserExist(int id) {
-        return userStorage.isUserExist(id);
+    public List<Film> getTopFilms(int count) {
+        return getFilms().stream()
+                .sorted((film, t1) -> t1.getRating() - film.getRating()) // Сортировка по рейтингу
+                .limit(count) // Ограничение количества фильмов
+                .collect(Collectors.toList()); // Сбор в список
     }
 }
