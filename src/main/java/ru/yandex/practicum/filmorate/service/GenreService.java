@@ -11,12 +11,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GenreService {
 
-    private final GenreDbStorage genreDbStorage;
+    private final GenreDbStorage genreDbStorage; // Хранение данных о жанрах
 
+    // Метод для получения списка всех жанров
     public List<Genre> getGenres() {
         return genreDbStorage.getGenres();
     }
 
+    // Метод для получения жанра по его идентификатору
     public Genre getGenre(int id) {
         return genreDbStorage.getGenreById(id);
     }

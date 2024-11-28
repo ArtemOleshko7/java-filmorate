@@ -1,21 +1,22 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.Builder; // Импортирует аннотацию для создания билдера
+import lombok.Data; // Импортирует аннотацию для генерации геттеров, сеттеров, equals и других методов
 
 import javax.validation.constraints.NotNull;
 
-@Builder
-@Data
-public class Genre implements Comparable<Genre> {
+@Builder // Позволяет использовать шаблон проектирования "Строитель" для создания объектов Genre
+@Data // Генерирует методы toString(), hashCode(), equals(), геттеры и сеттеры для полей
+public class Genre implements Comparable<Genre> { // Класс Genre реализует интерфейс Comparable для сортировки
 
-    @NotNull
-    private int id;
-    @NotNull
-    private String name;
+    @NotNull // Валидирует, что id не может быть null
+    private int id; // Идентификатор жанра
 
-    @Override
+    @NotNull // Валидирует, что name не может быть null
+    private String name; // Название жанра
+
+    @Override // Переопределяет метод compareTo для сортировки жанров по их идентификаторам
     public int compareTo(Genre o) {
-        return id - o.getId();
+        return id - o.getId(); // Сравнение текущего id с id другого жанра
     }
 }

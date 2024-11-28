@@ -10,11 +10,11 @@ import javax.validation.constraints.NotNull;
 public class Like {
 
     @NotNull
-    private final Long id;
+    private final Long id; // Идентификатор лайка
 
     @NotNull
-    private final Long filmId;
+    private final Long filmId; // Идентификатор фильма, которому поставлен лайк
 
     @NotNull
-    private final Long userId;
+    private final Long userId; // Идентификатор пользователя, который поставил лайк
 }

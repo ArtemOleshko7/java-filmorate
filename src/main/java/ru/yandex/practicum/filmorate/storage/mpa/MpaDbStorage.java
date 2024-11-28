@@ -20,11 +20,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MpaDbStorage implements MpaStorage {
 
-    private final JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate; // Объект для работы с базой данных
 
     @Override
     public List<Mpa> getMpaList() {
-        List<Mpa> mpas = new ArrayList<>();
+        List<Mpa> mpas = new ArrayList<>(); // Спискок для хранения MPA объектов
+        // Выполняем SQL-запрос для получения всех MPA
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet("SELECT * FROM MPA");
         while (rowSet.next()) {
             Mpa mpa = Mpa.builder()
@@ -39,6 +40,7 @@ public class MpaDbStorage implements MpaStorage {
     @Override
     public Mpa getMpa(int id) {
         try {
+            // Выполняем запрос для получения конкретного MPA по ID
             return jdbcTemplate.queryForObject("SELECT * FROM MPA WHERE MPA_ID = ?", this::rowMapToMpa, id);
         } catch (DataAccessException e) {
             throw new NotFoundException("Mpa not found");
@@ -47,6 +49,7 @@ public class MpaDbStorage implements MpaStorage {
 
     @Override
     public Mpa addToFilm(Film film) {
+        // Ищем MPA, соответствующий фильму, и устанавливаем его
         getMpaList().forEach(mpa -> {
             if (film.getMpa().getId().equals(mpa.getId())) {
                 film.setMpa(mpa);
@@ -56,9 +59,10 @@ public class MpaDbStorage implements MpaStorage {
     }
 
     private Mpa rowMapToMpa(ResultSet rs, int rowNum) throws SQLException {
+        // Метод для преобразования строки результата запроса в объект Mpa
         return Mpa.builder()
-                .id(rs.getLong("MPA_ID"))
-                .name(rs.getString("MPA_NAME"))
+                .id(rs.getLong("MPA_ID")) // Получаем ID
+                .name(rs.getString("MPA_NAME")) // Получаем имя
                 .build();
     }
 }

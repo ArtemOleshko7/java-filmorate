@@ -11,7 +11,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MpaService {
 
-    private final MpaDbStorage mpaDbStorage;
+    private final MpaDbStorage mpaDbStorage; // Хранилище данных для объектов MPA
 
     public List<Mpa> getMpaList() {
         return mpaDbStorage.getMpaList();
