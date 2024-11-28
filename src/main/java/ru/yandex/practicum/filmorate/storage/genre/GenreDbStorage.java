@@ -54,7 +54,7 @@ public class GenreDbStorage implements GenreStorage {
     public Film addGenre(Film film) {
         film.getGenres().forEach(genre ->
                 jdbcTemplate.update("INSERT INTO FILM_GENRE(GENRE_ID, FILM_ID) VALUES (?, ?)",
-                genre.getId(), film.getId()));
+                        genre.getId(), film.getId()));
         return film;
     }
 

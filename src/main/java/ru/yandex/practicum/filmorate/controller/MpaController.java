@@ -31,4 +31,3 @@ public class MpaController {
         return mpaService.getMpa(id);
     }
 }
-

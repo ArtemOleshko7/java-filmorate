@@ -65,11 +65,11 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User updateUser(User user) {
         String sql = "UPDATE USERS " +
-                     "SET USER_NAME = ?," +
-                         "LOGIN = ?," +
-                         "EMAIL = ?," +
-                         "BIRTHDAY = ? " +
-                     "WHERE USER_ID = ?";
+                "SET USER_NAME = ?," +
+                "LOGIN = ?," +
+                "EMAIL = ?," +
+                "BIRTHDAY = ? " +
+                "WHERE USER_ID = ?";
         int rowsCount = jdbcTemplate.update(sql,
                 user.getName(), user.getLogin(), user.getEmail(), user.getBirthday(), user.getId());
         if (rowsCount > 0) {
@@ -100,21 +100,21 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getSharedFriendsList(Long id, Long friendId) {
         String sql = "SELECT *" +
-                     "FROM USERS " +
-                     "WHERE USER_ID IN(SELECT FRIEND_ID " +
-                                      "FROM FRIENDS " +
-                                      "WHERE USER_ID = ?) " +
-                                      "AND USER_ID IN(SELECT FRIEND_ID " +
-                                                     "FROM FRIENDS " +
-                                                     "WHERE USER_ID = ?)";
+                "FROM USERS " +
+                "WHERE USER_ID IN(SELECT FRIEND_ID " +
+                "FROM FRIENDS " +
+                "WHERE USER_ID = ?) " +
+                "AND USER_ID IN(SELECT FRIEND_ID " +
+                "FROM FRIENDS " +
+                "WHERE USER_ID = ?)";
         return new ArrayList<>(jdbcTemplate.query(sql, this::rowMapToUser, id, friendId));
     }
 
     @Override
     public User getUserById(Long id) {
         String sql = "SELECT *" +
-                     "FROM USERS " +
-                     "WHERE USER_ID=?";
+                "FROM USERS " +
+                "WHERE USER_ID=?";
         try {
             return jdbcTemplate.queryForObject(sql, this::rowMapToUser, id);
         } catch (DataAccessException e) {
@@ -126,10 +126,10 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getFriends(Long id) {
         String sql = "SELECT U.*" +
-                     "FROM USERS " +
-                     "LEFT JOIN FRIENDS F on USERS.USER_ID = F.USER_ID " +
-                     "LEFT JOIN USERS U on U.USER_ID = F.FRIEND_ID " +
-                     "WHERE USERS.USER_ID = ?";
+                "FROM USERS " +
+                "LEFT JOIN FRIENDS F on USERS.USER_ID = F.USER_ID " +
+                "LEFT JOIN USERS U on U.USER_ID = F.FRIEND_ID " +
+                "WHERE USERS.USER_ID = ?";
         List<User> userList = jdbcTemplate.query(sql, this::rowMapToUser, id);
         return userList.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
