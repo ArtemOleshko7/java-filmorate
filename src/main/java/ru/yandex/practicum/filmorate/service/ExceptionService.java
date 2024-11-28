@@ -7,11 +7,5 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 @Service // Заявка класса как сервиса Spring, который будет управляться контейнером
 public class ExceptionService {
 
-    public void throwNotFound() {
-        throw new NotFoundException("Not found");
-    }
 
-    public void throwBadRequest(String message) {
-        throw new BadRequestException(message);
-    }
 }
