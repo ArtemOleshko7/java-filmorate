@@ -29,7 +29,7 @@ Backend-сервис для работы с фильмами и пользова
 ## 🚀 Запуск проекта
 
 1. Клонировать репозиторий:
-   git clone https://github.com/artem-shavriev/java-filmorate.git
+   git clone https://github.com/ArtemOleshko7/java-filmorate
 2. Настроить базу данных:
    -Создать БД
    -Настроить подключение в application.properties
